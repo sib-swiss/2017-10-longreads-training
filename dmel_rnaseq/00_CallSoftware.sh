@@ -14,3 +14,6 @@ export PATH="/home/aechchik/software/gmap-2017-04-24/bin:$PATH"
 
 # matchannot
 export PATH="/home/aechchik/software/MatchAnnot:$PATH"
+
+# gmap-gff3 to gtf2
+export PATH="/home/aechchik/software/custom/:$PATH"
