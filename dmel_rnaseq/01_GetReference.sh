@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# estimated runtime, 1 core: 
+# real	1m49.324s
+# user	0m42.280s
+# sys	0m1.375s
+
 echo 'Importing variables and calling software...'
 # import variables
 source 00_PrepareDataDir.sh
@@ -31,6 +36,12 @@ echo '---'
 echo 'Converting reference annotation in gtf format using gffread...'
 gffread Dmel_chr4.gff3 -T -o Dmel_chr4.gtf
 echo '...done.'
+echo '---'
+
+# build gmap index for reference genome
+echo 'Starting index...'
+gmap_build -d gmapidx -D . Dmel_chr4.fasta
+echo 'done.'
 echo '---'
 
 # return to original directory
