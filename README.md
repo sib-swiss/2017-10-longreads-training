@@ -1,6 +1,6 @@
 # Long Reads Workshop, Zurich 2017
 
-This is a place of development of materials for the long read workshop organised by Patricia Palagi within Training mission of [Swiss Instidute of Bioinformatics](https://www.sib.swiss/training).
+This is a place of development of materials for the long read workshop organised by Patricia Palagi within Training mission of [Swiss Institute of Bioinformatics](https://www.sib.swiss/training).
 This is the second time we organise the workshop, the materials of the last year can be found [here](https://github.com/aechchiki/SIB_LRW_Bern16).
 
 #### Development of materials
