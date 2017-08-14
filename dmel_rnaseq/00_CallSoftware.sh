@@ -10,7 +10,7 @@ module add UHTS/Analysis/poretools/0.5.1
 module add UHTS/PacBio/pbh5tools/0.8.0
 
 # gmap 
-export PATH='$PATH:/home/aechchik/software/gmap-2017-04-24/bin'
+export PATH="/home/aechchik/software/gmap-2017-04-24/bin:$PATH"
 
 # matchannot
-export PATH='$PATH:/home/aechchik/software/MatchAnnot'
+export PATH="/home/aechchik/software/MatchAnnot:$PATH"
