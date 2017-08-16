@@ -25,7 +25,7 @@ cat reads2D_mappedID_subsetf5.txt | while read file; do find $minion_dir/MiNionD
 echo 'Renaming files...'
 for file in $minion_dir/subsetf5/*.fast5; do newfile=$(echo "$file" | sed "s/HiSeq_20160624_FNfad12684_MN19020_sequencing_run_JR_cDNA_31487/minion/g"); mv "$file" $newfile; done
 echo 'Generating archive including only mapping fast5...'
-tar -zcf subsetf5.tar.gz $minion_dir/subsetf5
+tar zcf subsetf5.tar.gz $minion_dir/subsetf5/*
 archive_name=$(ls *f5.tar.gz)
 size_subsetf5=$(ll -h subsetf5.tar.gz | cut -f5 -d ' ')
 echo "The generated archive was written to $archive_name and has size: $size_subsetf5"
