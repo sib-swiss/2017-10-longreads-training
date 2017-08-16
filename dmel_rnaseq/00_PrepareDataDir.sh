@@ -1,11 +1,9 @@
 #!/bin/bash
 
 # setup working directory
-test_dir=/scratch/beegfs/monthly/aechchik/lr_zurich17
-mkdir -p $test_dir
+test_dir=$(pwd) # note: if you're going to replace the content of this line with a new directory, please do not include the final slash to the path to the directory to write to
 
 # setup subdirectories
-
 # reference
 ref_dir=$test_dir'/reference'
 mkdir -p $ref_dir
