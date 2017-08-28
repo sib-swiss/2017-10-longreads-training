@@ -20,7 +20,7 @@ SRX499318, SRA Study: SRP040522](https://www.ncbi.nlm.nih.gov/Traces/study/?acc=
 # contains a convertor of .sra to .fastq - fastq-dump
 module add UHTS/Analysis/sratoolkit/2.8.0
 # dee-serv04
-mkdir -p /scratch/local/kjaron/temp/ && cd /scratch/local/kjaron/temp/
+mkdir -p /scratch/local/kjaron/LongReadWorkshop/ && cd /scratch/local/kjaron/LongReadWorkshop/
 # list all the SRR entries withing the SRX experiment
 curl -l ftp://ftp-trace.ncbi.nih.gov/sra/sra-instant/reads/ByExp/sra/SRX/SRX499/SRX499318/ > list_of_accessions
 # dl .sra, convert it to .fq and remove .sra afterwards
@@ -30,4 +30,8 @@ for accesion in $(cat list_of_accessions); do
 done
 ```
 
-For this dataset I do not have h5 files, it might be possible to retrieve them from .sra files, but I have not really tried (not sure if it is that important).
+For this dataset I do not have h5 files, it might be possible to retrieve them from .sra files, but I have not really tried (not sure if it is that important). I also need a ch4 reference
+
+```
+wget ftp://ftp.ensemblgenomes.org/pub/metazoa/release-36/fasta/drosophila_melanogaster/dna/Drosophila_melanogaster.BDGP6.dna.chromosome.4.fa.gz
+```
