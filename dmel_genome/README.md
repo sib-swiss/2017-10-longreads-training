@@ -30,8 +30,59 @@ for accesion in $(cat list_of_accessions); do
 done
 ```
 
-For this dataset I do not have h5 files, it might be possible to retrieve them from .sra files, but I have not really tried (not sure if it is that important). I also need a ch4 reference
+For this dataset I do not have h5 files, it might be possible to retrieve them from .sra files, but I have not really tried (not sure if it is that important). I also need a ch4 indexed reference
 
 ```
 wget ftp://ftp.ensemblgenomes.org/pub/metazoa/release-36/fasta/drosophila_melanogaster/dna/Drosophila_melanogaster.BDGP6.dna.chromosome.4.fa.gz
+module add UHTS/Aligner/bwa/0.7.13
+bwa index Drosophila_melanogaster.BDGP6.dna.chromosome.4.fa.gz
+```
+
+I cleaned folder s bit (reads to reads, refrence to reference).
+Now I will just map reads and filter those that are actually mapping on a unique place (to avoid stuff like `TTTTTTTTTTTTTTTTTTTT`q mapping)
+
+```bash
+module add UHTS/Analysis/samtools/1.3
+for i in `ls reads`; do
+    bwa mem reference/Drosophila_melanogaster.BDGP6.dna.chromosome.4.fa.gz \
+        reads/$i | samtools view -h -F 4 - | samtools view -hb -F 2048 - > mapping/$(basename $i .fastq.gz).bam &
+done
+```
+
+convert bam to fastq
+
+```bash
+module add UHTS/Analysis/picard-tools/2.2.1
+mkdir ch4_reads
+for i in `ls mapping`; do
+    picard-tools SamToFastq I=mapping/$i FASTQ=ch4_reads/$(basename $i .bam).fastq QUIET=true
+done
+```
+
+```bash
+cat ch4_reads/* > dmel_ch4_reads.fastq
+gzip -9 dmel_ch4_reads.fastq
+
+module add UHTS/Quality_control/fastqc/0.11.2
+mkdir ch4_reads_QC
+# fastqc -d tmp -o ch4_reads_QC dmel_ch4_reads.fastq.gz
+# runinng out of memory on vital-it - should I run it locally?
+# is there a nicer way how to qc long reads?
+```
+
+Canu assenbly
+
+```bash
+module add UHTS/Assembler/canu/1.4
+canu -p dmel_ch4 -d asm_run1 genomeSize=2m -maxThreads=1 useGrid=false -pacbio-raw dmel_ch4_reads.fastq.gz
+# gatekeeperCreate did NOT finish successfully; too many short reads.  Check your reads!
+```
+
+
+
+TODO mapping
+
+```bash
+minimap dmel_ch4_reads.fastq.gz ch4_asm.fa
+# how to view the mapping? How would coverage plot looked like?
 ```
