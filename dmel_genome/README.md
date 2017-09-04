@@ -78,6 +78,11 @@ canu -p dmel_ch4 -d asm_run1 genomeSize=2m -maxThreads=1 useGrid=false -pacbio-r
 # gatekeeperCreate did NOT finish successfully; too many short reads.  Check your reads!
 ```
 
+Takes ages! I guess it is because I have a huge overkill of coverage (> 1000x), which is likely just a consequence of missmapping of reads from all the geneome to ch4.
+The solution would be to map reads to whole genome and extract only those that are mapping to unique place at chromosome 4 -> reads that are really for sure ch4.
+On coverage plot I can check if these reads are covering whole ch4 or not (maybe there would be some problematic regions that would be too close to each other and therefore have no unique mapping,
+however this should be fine if reads are long enough to map to this region uniquely thanks to specific flaking regions).
+This comment is moreless just a history record before I will rewrite section above accomotating this comment.
 
 
 TODO mapping
