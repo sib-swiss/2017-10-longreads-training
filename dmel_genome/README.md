@@ -33,28 +33,42 @@ done
 For this dataset I do not have h5 files, it might be possible to retrieve them from .sra files, but I have not really tried (not sure if it is that important). I also need a ch4 indexed reference
 
 ```
-wget ftp://ftp.ensemblgenomes.org/pub/metazoa/release-36/fasta/drosophila_melanogaster/dna/Drosophila_melanogaster.BDGP6.dna.chromosome.4.fa.gz
+mkdir -p reference && cd reference
+wget ftp://ftp.ensemblgenomes.org/pub/metazoa/release-36/fasta/drosophila_melanogaster/dna/Drosophila_melanogaster.BDGP6.dna.chromosome.*.fa.gz
+cat * > Dmel.ref.fa.gz
 module add UHTS/Aligner/bwa/0.7.13
-bwa index Drosophila_melanogaster.BDGP6.dna.chromosome.4.fa.gz
+bwa index Dmel.ref.fa.gz
 ```
 
-I cleaned folder s bit (reads to reads, refrence to reference).
-Now I will just map reads and filter those that are actually mapping on a unique place (to avoid stuff like `TTTTTTTTTTTTTTTTTTTT`q mapping)
+I cleaned folder s bit (reads to reads, refrence to reference). Now I want to find out how much I need to map to get a reasonable coverage (60 - 120x ??), so I just want to take a look deeply the genome is sequenced.
 
 ```bash
+for i in `ls reads`; do
+    ~/scripts/generic_genomics/fastq.gz2number_of_nt.sh reads/$i >> sequenced_nucleotides.txt
+done
+```
+
+167.4645x, alright, I will use just half of cells (just because it is pointless to use all).
+Now I will just map all the reads to genome keeping only uniquely mapping reads.
+
+```bash
+mkdir -p non_used_reads && cd reads
+mv $(ls | head -21) ../non_used_reads && cd ..
 module add UHTS/Analysis/samtools/1.3
 for i in `ls reads`; do
-    bwa mem reference/Drosophila_melanogaster.BDGP6.dna.chromosome.4.fa.gz \
+    bwa mem -t 2 reference/Dmel.ref.fa.gz \
         reads/$i | samtools view -h -F 4 - | samtools view -hb -F 2048 - > mapping/$(basename $i .fastq.gz).bam &
 done
 ```
 
-convert bam to fastq
+TODO filter reads mapping to ch4.
+TODO mapping -> filt_mapping
+Convert bam to fastq
 
 ```bash
 module add UHTS/Analysis/picard-tools/2.2.1
-mkdir ch4_reads
-for i in `ls mapping`; do
+mkdir -p ch4_reads
+for i in `ls filt_mapping`; do
     picard-tools SamToFastq I=mapping/$i FASTQ=ch4_reads/$(basename $i .bam).fastq QUIET=true
 done
 ```
@@ -82,7 +96,9 @@ Takes ages! I guess it is because I have a huge overkill of coverage (> 1000x), 
 The solution would be to map reads to whole genome and extract only those that are mapping to unique place at chromosome 4 -> reads that are really for sure ch4.
 On coverage plot I can check if these reads are covering whole ch4 or not (maybe there would be some problematic regions that would be too close to each other and therefore have no unique mapping,
 however this should be fine if reads are long enough to map to this region uniquely thanks to specific flaking regions).
-This comment is moreless just a history record before I will rewrite section above accomotating this comment.
+This comment is moreless just a history record before I will rewrite section above accommodating this comment.
+
+NOTE: make clear to audience why mapping is such an issue for long reads while short reads assembly can be very much mapping-less and why complexity of mapping of short reads to assembly (all vs reference) is different to problem of mapping for long read assembly (all vs all).
 
 
 TODO mapping
