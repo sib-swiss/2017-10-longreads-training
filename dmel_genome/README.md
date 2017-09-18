@@ -61,15 +61,23 @@ for i in `ls reads`; do
 done
 ```
 
-TODO filter reads mapping to ch4.
-TODO mapping -> filt_mapping
+sort bam files, index them and extract only reads mapping to ch4.
+
+```bash
+for i in *.bam; do samtools sort $i -o `basename $i .bam`.sort.bam; done
+for i in *.sort.bam; do samtools index $i; done
+cd ../filtered_mapping
+for i in ../mapping/*sort.bam; do samtools view $i 4 > `basename $i .sort.bam`_map_to_ch4.bam; done
+# 4 in the command means "View only records mapping to reference '4'."
+```
+
 Convert bam to fastq
 
 ```bash
 module add UHTS/Analysis/picard-tools/2.2.1
 mkdir -p ch4_reads
-for i in `ls filt_mapping`; do
-    picard-tools SamToFastq I=mapping/$i FASTQ=ch4_reads/$(basename $i .bam).fastq QUIET=true
+for i in filtered_mapping/*; do
+    picard-tools SamToFastq I=$i FASTQ=ch4_reads/$(basename $i .bam).fastq QUIET=true
 done
 ```
 
@@ -88,17 +96,15 @@ Canu assenbly
 
 ```bash
 module add UHTS/Assembler/canu/1.4
-canu -p dmel_ch4 -d asm_run1 genomeSize=2m -maxThreads=1 useGrid=false -pacbio-raw dmel_ch4_reads.fastq.gz
+canu -p dmel_ch4 -d asm_run3 genomeSize=2m -maxThreads=1 useGrid=false -pacbio-raw dmel_ch4_reads.fastq.gz
 # gatekeeperCreate did NOT finish successfully; too many short reads.  Check your reads!
 ```
 
-Takes ages! I guess it is because I have a huge overkill of coverage (> 1000x), which is likely just a consequence of missmapping of reads from all the geneome to ch4.
-The solution would be to map reads to whole genome and extract only those that are mapping to unique place at chromosome 4 -> reads that are really for sure ch4.
-On coverage plot I can check if these reads are covering whole ch4 or not (maybe there would be some problematic regions that would be too close to each other and therefore have no unique mapping,
-however this should be fine if reads are long enough to map to this region uniquely thanks to specific flaking regions).
-This comment is moreless just a history record before I will rewrite section above accommodating this comment.
+Assembly takes ~1h20' on single core, dual core will be about half (it's a well parallelized program).
 
-NOTE: make clear to audience why mapping is such an issue for long reads while short reads assembly can be very much mapping-less and why complexity of mapping of short reads to assembly (all vs reference) is different to problem of mapping for long read assembly (all vs all).
+NOTE : ask participants to chose their own parameters for assembly, so they can compare impact of parameters on the assembly.
+
+NOTE : make clear to audience why mapping is such an issue for long reads while short reads assembly can be very much mapping-less and why complexity of mapping of short reads to assembly (all vs reference) is different to problem of mapping for long read assembly (all vs all).
 
 
 TODO mapping
